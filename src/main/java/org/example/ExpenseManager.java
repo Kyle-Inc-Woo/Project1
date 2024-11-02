@@ -7,6 +7,8 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ExpenseManager {
     private static final String URL = "jdbc:mysql://localhost:3306/financial_db";
@@ -77,6 +79,26 @@ public class ExpenseManager {
             e.printStackTrace();
         }
         return total;
+    }
+
+    public Map<String, Double> getMonthlyExpenses(int userId){
+        String sql = "SELECT Month(date) AS month, SUM(amount) AS TOTAL FROM Expenses WHERE user_id = ? GROUP BY MONTH(date)";
+        Map<String, Double> monthlyExpenses = new HashMap<>();
+
+        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+        PreparedStatement pstmt = conn.prepareStatement(sql)){
+
+            pstmt.setInt(1, userId);
+            ResultSet rs = pstmt.executeQuery();
+
+            while(rs.next()){
+                String month = rs.getString("month");
+                Double total = rs.getDouble("total");
+            }
+        } catch(SQLException e){
+            e.printStackTrace();
+        }
+        return monthlyExpenses;
     }
 
 }
